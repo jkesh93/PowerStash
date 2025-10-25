@@ -1,0 +1,13 @@
+/* Ensures the theme toggle icons switch correctly */
+.dark .fa-sun {
+    display: block;
+}
+.dark .fa-moon {
+    display: none;
+}
+html:not(.dark) .fa-sun {
+    display: none;
+}
+html:not(.dark) .fa-moon {
+    display: block;
+}
