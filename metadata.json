@@ -1,0 +1,5 @@
+{
+  "name": "PowerStash",
+  "description": "An AI-powered tool to help you generate, edit, and organize PowerShell scripts with ease.",
+  "requestFramePermissions": []
+}
