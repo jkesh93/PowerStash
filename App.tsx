@@ -6,15 +6,17 @@ import ScriptViewer from './components/ScriptViewer';
 import ScriptEditor from './components/ScriptEditor';
 import { analyzeScriptContent } from './services/geminiService';
 import JSZip from 'jszip';
-import { SunIcon, MoonIcon, KeyIcon } from './components/Icons';
+import { SunIcon, MoonIcon, KeyIcon, MagicWandIcon } from './components/Icons';
 import ApiKeyModal from './components/ApiKeyModal';
 import Footer from './components/Footer';
 import PrivacyModal from './components/PrivacyModal';
+import AiAssistant from './components/AiAssistant';
 
 
 const LOCAL_STORAGE_KEY = 'powershell_scripts';
 const THEME_STORAGE_KEY = 'theme_preference';
 const API_KEY_STORAGE_KEY = 'gemini_api_key';
+const MODEL_STORAGE_KEY = 'gemini_model';
 
 
 export type Theme = 'light' | 'dark';
@@ -48,8 +50,10 @@ const App: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [model, setModel] = useState<string>('gemini-2.5-pro');
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -71,6 +75,12 @@ const App: React.FC = () => {
         setApiKey(storedApiKey);
       } else {
         setIsApiKeyModalOpen(true);
+      }
+      
+      // Load Model
+      const storedModel = localStorage.getItem(MODEL_STORAGE_KEY);
+      if (storedModel) {
+        setModel(storedModel);
       }
 
     } catch (error) {
@@ -99,6 +109,11 @@ const App: React.FC = () => {
     setApiKey(newApiKey);
     localStorage.setItem(API_KEY_STORAGE_KEY, newApiKey);
     setIsApiKeyModalOpen(false);
+  };
+  
+  const handleSaveModel = (newModel: string) => {
+    setModel(newModel);
+    localStorage.setItem(MODEL_STORAGE_KEY, newModel);
   };
   
   const handleSaveScript = useCallback((scriptData: Omit<Script, 'id' | 'createdAt'>) => {
@@ -213,7 +228,7 @@ const App: React.FC = () => {
                         resolve({script: null, error: `Could not read file: ${file.name}`});
                         return;
                     }
-                    const { title, tags } = await analyzeScriptContent(code, apiKey); 
+                    const { title, tags } = await analyzeScriptContent(code, apiKey, model); 
                     const newScript: Script = {
                         id: `script_${Date.now()}_${file.name.replace('.ps1', '')}`,
                         createdAt: new Date().toISOString(),
@@ -264,6 +279,8 @@ const App: React.FC = () => {
         onClose={() => setIsApiKeyModalOpen(false)}
         onSave={handleSaveApiKey}
         currentApiKey={apiKey}
+        selectedModel={model}
+        onModelChange={handleSaveModel}
       />
       <PrivacyModal
         isOpen={isPrivacyModalOpen}
@@ -318,6 +335,7 @@ const App: React.FC = () => {
                 onUpdateScript={handleUpdateScript}
                 onCancel={handleCancelEditing}
                 apiKey={apiKey}
+                model={model}
               />
             ) : selectedScript ? (
               <ScriptViewer
@@ -329,10 +347,32 @@ const App: React.FC = () => {
               <ScriptGenerator 
                 onSaveScript={handleSaveScript} 
                 apiKey={apiKey}
+                model={model}
               />
             )}
           </div>
           <Footer onPrivacyClick={() => setIsPrivacyModalOpen(true)} />
+          
+           {/* AI Assistant FAB */}
+           {!isAssistantOpen && (
+              <button
+                onClick={() => setIsAssistantOpen(true)}
+                className="absolute bottom-24 right-8 z-30 h-14 w-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800"
+                aria-label="Open AI Assistant"
+                title="Open AI Assistant"
+              >
+                <MagicWandIcon className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* AI Assistant Panel */}
+            {isAssistantOpen && (
+              <AiAssistant 
+                apiKey={apiKey}
+                model={model}
+                onClose={() => setIsAssistantOpen(false)}
+              />
+            )}
         </main>
       </div>
     </>

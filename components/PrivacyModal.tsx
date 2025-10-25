@@ -24,9 +24,13 @@ const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) => {
         <div className="space-y-4 text-gray-700 dark:text-gray-300 overflow-y-auto pr-2">
             <p><strong className="text-gray-800 dark:text-gray-200">Use of Google Gemini API:</strong> This application utilizes the Google Gemini API for features such as script generation, AI-powered editing, and content tagging. Your interactions with these features are processed by Google.</p>
             
-            <p><strong className="text-gray-800 dark:text-gray-200">API Key &amp; Charges:</strong> You are required to use your own Google Gemini API key. You are solely responsible for any and all charges incurred from the use of the API. This application does not cover any costs associated with your API usage.</p>
+            <p><strong className="text-gray-800 dark:text-gray-200">API Key &amp; Charges:</strong> You are required to use your own Google Gemini API key. You are solely responsible for any and all charges incurred from the use of the API. This application does not cover any costs associated with your API usage. For details on potential costs, please refer to the{' '}
+                <a href="https://ai.google.dev/pricing" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                    official Google AI pricing page
+                </a>.
+            </p>
             
-            <p><strong className="text-gray-800 dark:text-gray-200">Data Storage:</strong> This is a client-side application. All your scripts and your API key are stored locally in your browser's storage (<code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-sm">localStorage</code>). No data is sent to or stored on any server owned or operated by the site owner. Your data remains in your control on your machine.</p>
+            <p><strong className="text-gray-800 dark:text-gray-200">Data Storage &amp; Processing:</strong> This is a client-side application. Your API key and all your scripts are stored in your browser's local storage (<code className="bg-gray-200 dark:bg-gray-700 px-1 rounded text-sm">localStorage</code>). The PowerStash application itself does not have a server and does not collect your scripts. However, to enable AI functionality (generation, editing, analysis), the content of your scripts and prompts are sent directly from your browser to the Google Gemini API for processing. Exercise caution and avoid using sensitive or confidential information within scripts you send for AI processing.</p>
 
             <p><strong className="text-gray-800 dark:text-gray-200">Data Ownership &amp; Google's Terms:</strong> The ownership of any data (prompts, scripts) processed by the Google Gemini API is governed by the Google Gemini API Terms and Conditions. We recommend you review their terms to understand how your data is handled.</p>
 

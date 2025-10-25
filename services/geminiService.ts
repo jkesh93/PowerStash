@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Script } from '../types';
 
-export const generateScriptAndMetadata = async (prompt: string, userApiKey: string | null): Promise<Omit<Script, 'id' | 'createdAt'>> => {
+export const generateScriptAndMetadata = async (prompt: string, userApiKey: string | null, model: string): Promise<Omit<Script, 'id' | 'createdAt'>> => {
   if (!userApiKey) {
     throw new Error("API key not found. Please set your Gemini API key using the key icon in the header.");
   }
@@ -26,7 +26,7 @@ export const generateScriptAndMetadata = async (prompt: string, userApiKey: stri
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: model,
       contents: fullPrompt,
       config: {
         responseMimeType: "application/json",
@@ -63,7 +63,7 @@ export const generateScriptAndMetadata = async (prompt: string, userApiKey: stri
   }
 };
 
-export const editScript = async (originalCode: string, editPrompt: string, userApiKey: string | null): Promise<{ code: string }> => {
+export const editScript = async (originalCode: string, editPrompt: string, userApiKey: string | null, model: string): Promise<{ code: string }> => {
   if (!userApiKey) {
     throw new Error("API key not found. Please set your Gemini API key using the key icon in the header.");
   }
@@ -85,7 +85,7 @@ export const editScript = async (originalCode: string, editPrompt: string, userA
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: model,
       contents: fullPrompt,
       config: {
         responseMimeType: "application/json",
@@ -112,7 +112,7 @@ export const editScript = async (originalCode: string, editPrompt: string, userA
   }
 };
 
-export const analyzeScriptContent = async (scriptCode: string, userApiKey: string | null): Promise<{ title: string; tags: string[] }> => {
+export const analyzeScriptContent = async (scriptCode: string, userApiKey: string | null, model: string): Promise<{ title: string; tags: string[] }> => {
   if (!userApiKey) {
     throw new Error("API key not found. Please set your Gemini API key using the key icon in the header.");
   }
@@ -137,7 +137,7 @@ export const analyzeScriptContent = async (scriptCode: string, userApiKey: strin
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: model,
       contents: fullPrompt,
       config: {
         responseMimeType: "application/json",

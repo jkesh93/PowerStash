@@ -10,9 +10,10 @@ interface ScriptEditorProps {
     onUpdateScript: (scriptId: string, newCode: string) => void;
     onCancel: () => void;
     apiKey: string | null;
+    model: string;
 }
 
-const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, apiKey }) => {
+const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, apiKey, model }) => {
     const [editPrompt, setEditPrompt] = useState('');
     const [newCode, setNewCode] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +28,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onC
         setError(null);
         setNewCode(null);
         try {
-            const result = await editScript(script.code, editPrompt, apiKey);
+            const result = await editScript(script.code, editPrompt, apiKey, model);
             setNewCode(result.code);
         } catch (err) {
             if (err instanceof Error) {

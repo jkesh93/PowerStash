@@ -8,9 +8,10 @@ import Tag from './Tag';
 interface ScriptGeneratorProps {
   onSaveScript: (scriptData: Omit<Script, 'id' | 'createdAt'>) => void;
   apiKey: string | null;
+  model: string;
 }
 
-const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, apiKey }) => {
+const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, apiKey, model }) => {
   const [prompt, setPrompt] = useState('');
   const [generatedScript, setGeneratedScript] = useState<Omit<Script, 'id' | 'createdAt'> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,7 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, apiKey 
     setError(null);
     setGeneratedScript(null);
     try {
-      const result = await generateScriptAndMetadata(prompt, apiKey);
+      const result = await generateScriptAndMetadata(prompt, apiKey, model);
       setGeneratedScript(result);
     } catch (err) {
       if (err instanceof Error) {

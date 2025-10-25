@@ -1,5 +1,5 @@
 import React from 'react';
-import { CoffeeIcon, GithubIcon } from './Icons';
+import { CoffeeIcon, GithubIcon, LicenseIcon } from './Icons';
 
 interface FooterProps {
   onPrivacyClick: () => void;
@@ -16,6 +16,15 @@ const Footer: React.FC<FooterProps> = ({ onPrivacyClick }) => {
           Privacy &amp; Terms
         </button>
         <div className="flex items-center space-x-6 flex-shrink-0">
+           <a 
+            href="https://www.gnu.org/licenses/agpl-3.0.html" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center space-x-2"
+          >
+            <LicenseIcon className="text-lg"/>
+            <span>GNU AGPLv3 License</span>
+          </a>
           <a 
             href="https://buymeacoffee.com/jay1118936" 
             target="_blank" 

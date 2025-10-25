@@ -55,3 +55,15 @@ export const CoffeeIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const GithubIcon: React.FC<{ className?: string }> = ({ className }) => (
     <i className={`fa-brands fa-github ${className}`}></i>
 );
+
+export const LicenseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <i className={`fa-solid fa-scale-balanced ${className}`}></i>
+);
+
+export const PaperPlaneIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <i className={`fa-solid fa-paper-plane ${className}`}></i>
+);
+
+export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <i className={`fa-solid fa-xmark ${className}`}></i>
+);

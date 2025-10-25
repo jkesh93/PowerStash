@@ -1,0 +1,32 @@
+/* Ensures the theme toggle icons switch correctly */
+.dark .fa-sun {
+    display: block;
+}
+.dark .fa-moon {
+    display: none;
+}
+html:not(.dark) .fa-sun {
+    display: none;
+}
+html:not(.dark) .fa-moon {
+    display: block;
+}
+
+/* Scroll Animation Styles */
+.feature-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.feature-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger the animation for a nicer effect */
+.feature-card:nth-child(2) { transition-delay: 0.1s; }
+.feature-card:nth-child(3) { transition-delay: 0.2s; }
+.feature-card:nth-child(4) { transition-delay: 0.0s; } /* Reset for next row */
+.feature-card:nth-child(5) { transition-delay: 0.1s; }
+.feature-card:nth-child(6) { transition-delay: 0.2s; }

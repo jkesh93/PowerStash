@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerStash - AI-Powered PowerShell Script Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              indigo: {
+                50: '#eef2ff',
+                100: '#e0e7ff',
+                200: '#c7d2fe',
+                300: '#a5b4fc',
+                400: '#818cf8',
+                500: '#6366f1',
+                600: '#4f46e5',
+                700: '#4338ca',
+                800: '#3730a3',
+                900: '#312e81',
+                950: '#1e1b4b',
+              },
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans antialiased transition-colors duration-300">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-bolt-lightning text-2xl text-indigo-500"></i>
+                <span class="text-2xl font-bold text-gray-900 dark:text-white">PowerStash</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors" aria-label="Toggle theme">
+                    <i class="fa-solid fa-sun text-lg"></i>
+                    <i class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a href="https://app.powerstash.io" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors inline-flex items-center">
+                    <i class="fa-solid fa-rocket mr-2"></i>Launch App
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="pt-32 pb-20 bg-white dark:bg-gray-950">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                    Stop Searching, <span class="text-indigo-500">Start Scripting</span>.
+                </h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-600 dark:text-gray-400">
+                    Your PowerShell library is a mess. PowerStash is the AI-powered, instantly searchable workspace that organizes your scripts for you. Generate, edit, and find what you need in seconds.
+                </p>
+                <div class="mt-10">
+                    <a href="https://app.powerstash.io" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 inline-flex items-center">
+                        <i class="fa-solid fa-rocket mr-2"></i>Get Started - It's Free
+                    </a>
+                    <p class="mt-4 text-xs text-gray-500">No sign-up required. AI features powered by Google Gemini.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-24 bg-gray-100 dark:bg-gray-900">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Your PowerShell Scripts, Supercharged.</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
+                        PowerStash isn't just a folder for your .ps1 files. It's an active, intelligent partner in your automation journey.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h3 class="text-xl font-bold mb-2">AI Script Generation</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Describe what you need in plain English, and watch as PowerStash crafts a well-commented, ready-to-use PowerShell script.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-tags"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Automatic Organization</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Drag in a folder of scripts, and our AI will analyze, title, and tag each one, turning your chaotic collection into a structured library.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Instant, Smart Search</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Find the exact script you need in seconds. Search by title, tag, or even functionality. No more guessing filenames.</p>
+                    </div>
+                    <!-- Feature 4 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-pencil"></i></div>
+                        <h3 class="text-xl font-bold mb-2">AI-Powered Editing</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Need to refactor, add error handling, or optimize? Just tell the AI what to change and review the suggested diff before accepting.</p>
+                    </div>
+                     <!-- Feature 5 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-comments"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Expert AI Assistant</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Stuck on a problem? Open the AI chat to ask questions, debug code, or learn new PowerShell concepts without ever leaving the app.</p>
+                    </div>
+                     <!-- Feature 6 -->
+                    <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                        <div class="text-3xl text-indigo-500 mb-4"><i class="fa-solid fa-lock"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Secure & Private</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Your scripts and API key are stored locally in your browser. We never see your data. For AI features, your script content is sent to the Google Gemini API for processing. Exercise caution with sensitive code.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Use Cases Section -->
+        <section class="py-24 bg-white dark:bg-gray-950">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Built for the Modern Scripter</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
+                        Whether you're automating enterprise infrastructure or just learning the ropes, PowerStash adapts to your needs.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="bg-gray-100 dark:bg-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800">
+                        <h3 class="text-2xl font-bold mb-4 text-indigo-500">For the IT Professional & DevOps Engineer</h3>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Automate Faster:</strong> Quickly generate scripts for user onboarding, system reports, or file management.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Deploy with Confidence:</strong> Easily find and reuse battle-tested scripts for infrastructure deployment and configuration.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Never Lose Work:</strong> Instantly locate that one critical script from years ago with a simple search query.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800">
+                        <h3 class="text-2xl font-bold mb-4 text-indigo-500">For the PowerShell Learner</h3>
+                         <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Learn by Doing:</strong> Generate a script and have the AI Assistant explain how each part works, line by line.</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Debug with a Guide:</strong> Paste your broken code into the chat and get helpful suggestions and fixes from the AI.</span></li>
+                             <li class="flex items-start"><i class="fa-solid fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Explore Advanced Concepts:</strong> Ask the assistant about complex topics like modules, DSC, or asynchronous operations.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-24 bg-gray-100 dark:bg-gray-900">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Frequently Asked Questions</h2>
+                </div>
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <!-- FAQ Item 1 -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">How do I get a Google API Key?</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">You'll need a Gemini API key to use the AI features. It's free and easy to get started:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                            <li>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-indigo-500 hover:underline">Google AI Studio</a>.</li>
+                            <li>Click the "Get API key" button. You may need to sign in with your Google account.</li>
+                            <li>If prompted, create a new project in Google Cloud.</li>
+                            <li>Click "Create API key in existing project" or "Create API key".</li>
+                            <li>Your new key will be generated. Copy it.</li>
+                            <li>Paste the key into the settings modal in the PowerStash app when you first launch it.</li>
+                        </ol>
+                    </div>
+                    <!-- FAQ Item 2 -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Do I need to sign up for PowerStash?</h3>
+                        <p class="text-gray-600 dark:text-gray-400">No. PowerStash requires no user accounts, registration, or login. You can start using it immediately. It's designed to be simple and private.</p>
+                    </div>
+                    <!-- FAQ Item 3 -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Where is my data stored?</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                           <strong>Locally on your device:</strong> Your entire script library and API key are stored in your browser's local storage. PowerStash servers do not receive or store any of this information.
+                           <br/><br/>
+                           <strong>When using AI features:</strong> To generate, edit, or analyze scripts, the relevant code and your prompts are sent to the Google Gemini API for processing. Please exercise the same caution you would with any AI service and avoid submitting sensitive or proprietary information.
+                        </p>
+                    </div>
+                     <!-- FAQ Item 4 -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Is PowerStash free?</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Yes, the PowerStash application is 100% free and open-source. However, you are responsible for any costs incurred from using the Google Gemini API. Google provides a generous free tier that is more than enough for most users to get started. You can check their <a href="https://ai.google.dev/pricing" target="_blank" rel="noopener noreferrer" class="text-indigo-500 hover:underline">pricing page</a> for details.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="py-24 bg-indigo-600 dark:bg-indigo-900/50">
+             <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white">Ready to Organize Your PowerShell Chaos?</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-indigo-200">
+                    Take control of your script library. Get started with PowerStash today and transform the way you work with PowerShell.
+                </p>
+                <div class="mt-10">
+                    <a href="https://app.powerstash.io" class="bg-white hover:bg-gray-200 text-indigo-600 font-bold py-4 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 inline-block items-center">
+                        <i class="fa-solid fa-rocket mr-2"></i>Launch PowerStash Now
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800">
+        <div class="container mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center text-gray-500 dark:text-gray-400 space-y-4 sm:space-y-0">
+            <p class="text-sm">&copy; 2025 Mission Matrix LLC. All Rights Reserved.</p>
+            <div class="flex items-center space-x-6">
+                <a 
+                  href="https://www.gnu.org/licenses/agpl-3.0.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors inline-flex items-center space-x-2 text-sm"
+                >
+                  <i class="fa-solid fa-scale-balanced text-lg"></i>
+                  <span>GNU AGPLv3 License</span>
+                </a>
+                <a 
+                  href="https://buymeacoffee.com/jay1118936" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors inline-flex items-center space-x-2 text-sm"
+                >
+                  <i class="fa-solid fa-coffee text-lg"></i>
+                  <span>Support this project</span>
+                </a>
+                <a 
+                  href="https://github.com/jkesh93/PowerStash" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors inline-flex items-center space-x-2 text-sm"
+                >
+                  <i class="fa-brands fa-github text-lg"></i>
+                  <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

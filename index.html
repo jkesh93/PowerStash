@@ -5,13 +5,47 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PowerStash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script>
       tailwind.config = {
         darkMode: 'class',
       }
     </script>
+    <style>
+      /* Custom scrollbar for webkit browsers */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(136, 136, 136, 0.5); /* #888 with opacity */
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(85, 85, 85, 0.5); /* #555 with opacity */
+      }
+      
+      /* Animation for chat assistant */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .animate-slide-in {
+        animation: slideIn 0.2s ease-out forwards;
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
@@ -19,7 +53,9 @@
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0",
-    "jszip": "https://esm.sh/jszip@3.10.1"
+    "jszip": "https://esm.sh/jszip@3.10.1",
+    "marked": "https://esm.sh/marked@12.0.2",
+    "dompurify": "https://esm.sh/dompurify@3.1.5"
   }
 }
 </script>
