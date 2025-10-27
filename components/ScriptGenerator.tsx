@@ -8,16 +8,20 @@ import Tag from './Tag';
 interface ScriptGeneratorProps {
   onSaveScript: (scriptData: Omit<Script, 'id' | 'createdAt'>) => void;
   model: string;
-  onApiKeyError: () => void;
+  apiKey: string;
 }
 
-const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, model, onApiKeyError }) => {
+const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, model, apiKey }) => {
   const [prompt, setPrompt] = useState('');
   const [generatedScript, setGeneratedScript] = useState<Omit<Script, 'id' | 'createdAt'> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
+    if (!apiKey) {
+      setError('Please set your Gemini API key in the AI Settings (key icon in top right).');
+      return;
+    }
     if (!prompt.trim()) {
       setError('Please enter a description for the script.');
       return;
@@ -26,16 +30,11 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, model, 
     setError(null);
     setGeneratedScript(null);
     try {
-      const result = await generateScriptAndMetadata(prompt, model);
+      const result = await generateScriptAndMetadata(prompt, model, apiKey);
       setGeneratedScript(result);
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message === 'API_KEY_ERROR') {
-          onApiKeyError();
-          setError("There's an issue with your API key. Please select a valid one.");
-        } else {
           setError(err.message);
-        }
       } else {
         setError('An unknown error occurred.');
       }

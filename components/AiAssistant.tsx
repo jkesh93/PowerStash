@@ -12,7 +12,7 @@ interface Message {
 interface AiAssistantProps {
   model: string;
   onClose: () => void;
-  onApiKeyError: () => void;
+  apiKey: string;
 }
 
 const ChatCodeBlock: React.FC<{ code: string }> = ({ code }) => {
@@ -67,7 +67,7 @@ const renderMessageContent = (text: string) => {
     });
 };
 
-const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, onApiKeyError }) => {
+const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, apiKey }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -82,11 +82,9 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, onApiKeyError
   useEffect(scrollToBottom, [messages, isLoading]);
 
   const initializeChat = useCallback(async () => {
-    // @ts-ignore
-    const hasKey = window.aistudio && await window.aistudio.hasSelectedApiKey();
-    if (hasKey) {
+    if (apiKey) {
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey });
         chatRef.current = ai.chats.create({
           model: model,
           config: {
@@ -98,31 +96,27 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, onApiKeyError
       } catch (e) {
         console.error("Failed to initialize chat:", e);
         setError("Failed to initialize AI Assistant. Please check your API key.");
-        if (e instanceof Error && (e.message.includes('API key not valid') || e.message.includes('Requested entity was not found'))) {
-           onApiKeyError();
-        }
         return false;
       }
     }
     return false;
-  }, [model, onApiKeyError]);
+  }, [model, apiKey]);
   
   useEffect(() => {
-    initializeChat();
+    if(apiKey) {
+        initializeChat();
+    }
     setMessages([
-      { role: 'model', text: 'Hello! I am your PowerShell AI assistant. How can I help you today?' }
+      { role: 'model', text: apiKey ? 'Hello! I am your PowerShell AI assistant. How can I help you today?' : 'Hello! Please set your Gemini API key in the AI settings to use the assistant.' }
     ]);
-  }, [initializeChat]);
+  }, [initializeChat, apiKey]);
 
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
     
-    // @ts-ignore
-    const hasKey = window.aistudio && await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      setError("Please select a Gemini API key to use the assistant.");
-      onApiKeyError();
+    if (!apiKey) {
+      setError("Please set your Gemini API key to use the assistant.");
       return;
     }
     
@@ -156,13 +150,15 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, onApiKeyError
       }
     } catch (err) {
       console.error(err);
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
        let displayError = "Sorry, something went wrong. Please try again.";
-      if (errorMessage.includes('API key not valid') || errorMessage.includes('Requested entity was not found')) {
-        displayError = "Your API key is invalid. Please select a valid one.";
-        onApiKeyError();
-      } else if (errorMessage.includes('429')) {
-        displayError = "You have exceeded your quota. Please check your billing account or try again later.";
+      if (err instanceof Error) {
+          if (err.message.includes('API key not valid') || err.message.includes('API key is invalid')) {
+            displayError = "Your API key is invalid. Please check it in the AI Settings.";
+          } else if (err.message.includes('429')) {
+            displayError = "You have exceeded your quota. Please check your billing account or try again later.";
+          } else {
+            displayError = err.message;
+          }
       }
       setError(displayError);
       setMessages(prev => prev.slice(0, prev.length -1)); 

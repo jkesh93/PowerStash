@@ -1,8 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Script } from '../types';
 
-export const generateScriptAndMetadata = async (prompt: string, model: string): Promise<Omit<Script, 'id' | 'createdAt'>> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const generateScriptAndMetadata = async (prompt: string, model: string, apiKey: string): Promise<Omit<Script, 'id' | 'createdAt'>> => {
+  if (!apiKey) {
+    throw new Error("API key is missing. Please set it in the AI Settings.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const fullPrompt = `
@@ -52,15 +55,18 @@ export const generateScriptAndMetadata = async (prompt: string, model: string): 
     };
   } catch (error) {
     console.error("Error generating script:", error);
-    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('Requested entity was not found'))) {
-       throw new Error("API_KEY_ERROR");
+    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('API key is invalid'))) {
+       throw new Error("Your API key is invalid. Please check it in the AI Settings.");
     }
     throw new Error("Failed to generate script. Please check your network connection and API key.");
   }
 };
 
-export const editScript = async (originalCode: string, editPrompt: string, model: string): Promise<{ code: string }> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const editScript = async (originalCode: string, editPrompt: string, model: string, apiKey: string): Promise<{ code: string }> => {
+  if (!apiKey) {
+    throw new Error("API key is missing. Please set it in the AI Settings.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const fullPrompt = `
@@ -101,15 +107,18 @@ export const editScript = async (originalCode: string, editPrompt: string, model
     };
   } catch (error) {
     console.error("Error editing script:", error);
-    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('Requested entity was not found'))) {
-       throw new Error("API_KEY_ERROR");
+    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('API key is invalid'))) {
+       throw new Error("Your API key is invalid. Please check it in the AI Settings.");
     }
     throw new Error("Failed to edit script. Please try again.");
   }
 };
 
-export const analyzeScriptContent = async (scriptCode: string, model: string): Promise<{ title: string; tags: string[] }> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const analyzeScriptContent = async (scriptCode: string, model: string, apiKey: string): Promise<{ title: string; tags: string[] }> => {
+  if (!apiKey) {
+    throw new Error("API key is missing. Please set it in the AI Settings.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const fullPrompt = `
@@ -158,8 +167,8 @@ export const analyzeScriptContent = async (scriptCode: string, model: string): P
     };
   } catch (error) {
     console.error("Error analyzing script:", error);
-    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('Requested entity was not found'))) {
-       throw new Error("API_KEY_ERROR");
+    if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('API key is invalid'))) {
+       throw new Error("Your API key is invalid. Please check it in the AI Settings.");
     }
     throw new Error("Failed to analyze script content. Please try again.");
   }

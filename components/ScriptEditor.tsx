@@ -10,16 +10,20 @@ interface ScriptEditorProps {
     onUpdateScript: (scriptId: string, newCode: string) => void;
     onCancel: () => void;
     model: string;
-    onApiKeyError: () => void;
+    apiKey: string;
 }
 
-const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, model, onApiKeyError }) => {
+const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, model, apiKey }) => {
     const [editPrompt, setEditPrompt] = useState('');
     const [newCode, setNewCode] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     
     const handleGenerateEdits = async () => {
+        if (!apiKey) {
+            setError('Please set your Gemini API key in the AI Settings to use this feature.');
+            return;
+        }
         if (!editPrompt.trim()) {
             setError('Please describe the changes you want to make.');
             return;
@@ -28,16 +32,11 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onC
         setError(null);
         setNewCode(null);
         try {
-            const result = await editScript(script.code, editPrompt, model);
+            const result = await editScript(script.code, editPrompt, model, apiKey);
             setNewCode(result.code);
         } catch (err) {
             if (err instanceof Error) {
-                if (err.message === 'API_KEY_ERROR') {
-                    onApiKeyError();
-                    setError("There's an issue with your API key. Please select a valid one.");
-                } else {
-                    setError(err.message);
-                }
+                setError(err.message);
             } else {
                 setError('An unknown error occurred while generating edits.');
             }
