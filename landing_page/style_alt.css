@@ -11,3 +11,17 @@ html:not(.dark) .fa-sun {
 html:not(.dark) .fa-moon {
     display: block;
 }
+
+/* Blinking cursor animation */
+.blinking-cursor {
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to {
+        color: transparent;
+    }
+    50% {
+        color: inherit;
+    }
+}

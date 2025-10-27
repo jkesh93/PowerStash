@@ -9,11 +9,11 @@ interface ScriptEditorProps {
     script: Script;
     onUpdateScript: (scriptId: string, newCode: string) => void;
     onCancel: () => void;
-    apiKey: string | null;
     model: string;
+    onApiKeyError: () => void;
 }
 
-const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, apiKey, model }) => {
+const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onCancel, model, onApiKeyError }) => {
     const [editPrompt, setEditPrompt] = useState('');
     const [newCode, setNewCode] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -28,11 +28,16 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onUpdateScript, onC
         setError(null);
         setNewCode(null);
         try {
-            const result = await editScript(script.code, editPrompt, apiKey, model);
+            const result = await editScript(script.code, editPrompt, model);
             setNewCode(result.code);
         } catch (err) {
             if (err instanceof Error) {
-                setError(err.message);
+                if (err.message === 'API_KEY_ERROR') {
+                    onApiKeyError();
+                    setError("There's an issue with your API key. Please select a valid one.");
+                } else {
+                    setError(err.message);
+                }
             } else {
                 setError('An unknown error occurred while generating edits.');
             }

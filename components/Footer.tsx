@@ -34,15 +34,6 @@ const Footer: React.FC<FooterProps> = ({ onPrivacyClick }) => {
             <CoffeeIcon className="text-lg"/>
             <span>Support this project</span>
           </a>
-          <a 
-            href="https://github.com/jkesh93/PowerStash" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center space-x-2"
-          >
-            <GithubIcon className="text-lg"/>
-            <span>GitHub</span>
-          </a>
         </div>
       </div>
     </footer>

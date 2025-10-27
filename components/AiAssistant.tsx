@@ -10,9 +10,9 @@ interface Message {
 }
 
 interface AiAssistantProps {
-  apiKey: string | null;
   model: string;
   onClose: () => void;
+  onApiKeyError: () => void;
 }
 
 const ChatCodeBlock: React.FC<{ code: string }> = ({ code }) => {
@@ -67,7 +67,7 @@ const renderMessageContent = (text: string) => {
     });
 };
 
-const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => {
+const AiAssistant: React.FC<AiAssistantProps> = ({ model, onClose, onApiKeyError }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,10 +81,12 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => 
 
   useEffect(scrollToBottom, [messages, isLoading]);
 
-  const initializeChat = useCallback(() => {
-    if (apiKey) {
+  const initializeChat = useCallback(async () => {
+    // @ts-ignore
+    const hasKey = window.aistudio && await window.aistudio.hasSelectedApiKey();
+    if (hasKey) {
       try {
-        const ai = new GoogleGenAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         chatRef.current = ai.chats.create({
           model: model,
           config: {
@@ -92,16 +94,21 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => 
           },
         });
         setError(null);
+        return true;
       } catch (e) {
         console.error("Failed to initialize chat:", e);
         setError("Failed to initialize AI Assistant. Please check your API key.");
+        if (e instanceof Error && (e.message.includes('API key not valid') || e.message.includes('Requested entity was not found'))) {
+           onApiKeyError();
+        }
+        return false;
       }
     }
-  }, [apiKey, model]);
+    return false;
+  }, [model, onApiKeyError]);
   
   useEffect(() => {
     initializeChat();
-    // Reset chat history when API key or model changes to start a fresh session
     setMessages([
       { role: 'model', text: 'Hello! I am your PowerShell AI assistant. How can I help you today?' }
     ]);
@@ -110,15 +117,18 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => 
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
-
-    if (!apiKey) {
-      setError("Please set your Gemini API key to use the assistant.");
+    
+    // @ts-ignore
+    const hasKey = window.aistudio && await window.aistudio.hasSelectedApiKey();
+    if (!hasKey) {
+      setError("Please select a Gemini API key to use the assistant.");
+      onApiKeyError();
       return;
     }
     
     if (!chatRef.current) {
-        initializeChat();
-        if(!chatRef.current) {
+        const initialized = await initializeChat();
+        if(!initialized) {
             setError("AI Assistant is not initialized. Please check your API key.");
             return;
         }
@@ -131,7 +141,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => 
     setError(null);
 
     try {
-      const stream = await chatRef.current.sendMessageStream({ message: input });
+      const stream = await chatRef.current!.sendMessageStream({ message: input });
       
       let modelResponse = '';
       setMessages(prev => [...prev, { role: 'model', text: '' }]);
@@ -148,8 +158,9 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ apiKey, model, onClose }) => 
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
        let displayError = "Sorry, something went wrong. Please try again.";
-      if (errorMessage.includes('API key not valid')) {
-        displayError = "Your API key is invalid. Please update it.";
+      if (errorMessage.includes('API key not valid') || errorMessage.includes('Requested entity was not found')) {
+        displayError = "Your API key is invalid. Please select a valid one.";
+        onApiKeyError();
       } else if (errorMessage.includes('429')) {
         displayError = "You have exceeded your quota. Please check your billing account or try again later.";
       }

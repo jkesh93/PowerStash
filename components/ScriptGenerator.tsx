@@ -7,11 +7,11 @@ import Tag from './Tag';
 
 interface ScriptGeneratorProps {
   onSaveScript: (scriptData: Omit<Script, 'id' | 'createdAt'>) => void;
-  apiKey: string | null;
   model: string;
+  onApiKeyError: () => void;
 }
 
-const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, apiKey, model }) => {
+const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, model, onApiKeyError }) => {
   const [prompt, setPrompt] = useState('');
   const [generatedScript, setGeneratedScript] = useState<Omit<Script, 'id' | 'createdAt'> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +26,16 @@ const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ onSaveScript, apiKey,
     setError(null);
     setGeneratedScript(null);
     try {
-      const result = await generateScriptAndMetadata(prompt, apiKey, model);
+      const result = await generateScriptAndMetadata(prompt, model);
       setGeneratedScript(result);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        if (err.message === 'API_KEY_ERROR') {
+          onApiKeyError();
+          setError("There's an issue with your API key. Please select a valid one.");
+        } else {
+          setError(err.message);
+        }
       } else {
         setError('An unknown error occurred.');
       }

@@ -7,7 +7,8 @@ import ScriptEditor from './components/ScriptEditor';
 import { analyzeScriptContent } from './services/geminiService';
 import JSZip from 'jszip';
 import { SunIcon, MoonIcon, KeyIcon, MagicWandIcon } from './components/Icons';
-import ApiKeyModal from './components/ApiKeyModal';
+import SettingsModal from './components/SettingsModal';
+import ApiKeyWizard from './components/ApiKeyWizard';
 import Footer from './components/Footer';
 import PrivacyModal from './components/PrivacyModal';
 import AiAssistant from './components/AiAssistant';
@@ -15,7 +16,6 @@ import AiAssistant from './components/AiAssistant';
 
 const LOCAL_STORAGE_KEY = 'powershell_scripts';
 const THEME_STORAGE_KEY = 'theme_preference';
-const API_KEY_STORAGE_KEY = 'gemini_api_key';
 const MODEL_STORAGE_KEY = 'gemini_model';
 
 
@@ -49,9 +49,9 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('dark');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [apiKey, setApiKey] = useState<string | null>(null);
   const [model, setModel] = useState<string>('gemini-2.5-pro');
-  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [showApiKeyWizard, setShowApiKeyWizard] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const folderInputRef = useRef<HTMLInputElement>(null);
@@ -69,13 +69,20 @@ const App: React.FC = () => {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
       
-      // Load API Key
-      const storedApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-      if (storedApiKey) {
-        setApiKey(storedApiKey);
-      } else {
-        setIsApiKeyModalOpen(true);
-      }
+      // Check for API Key
+      const checkApiKey = async () => {
+        // @ts-ignore - aistudio is injected by the environment
+        if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
+            // @ts-ignore
+            const hasKey = await window.aistudio.hasSelectedApiKey();
+            if (!hasKey) {
+                setShowApiKeyWizard(true);
+            }
+        } else {
+            console.warn("aistudio context not available. API key selection may not work.");
+        }
+      };
+      checkApiKey();
       
       // Load Model
       const storedModel = localStorage.getItem(MODEL_STORAGE_KEY);
@@ -104,12 +111,6 @@ const App: React.FC = () => {
       root.classList.add(theme);
       localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
-
-  const handleSaveApiKey = (newApiKey: string) => {
-    setApiKey(newApiKey);
-    localStorage.setItem(API_KEY_STORAGE_KEY, newApiKey);
-    setIsApiKeyModalOpen(false);
-  };
   
   const handleSaveModel = (newModel: string) => {
     setModel(newModel);
@@ -195,13 +196,19 @@ const App: React.FC = () => {
     folderInputRef.current?.click();
   };
 
+  const handleApiKeyError = useCallback(() => {
+    setShowApiKeyWizard(true);
+  }, []);
+
   const handleFolderUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    if (!apiKey) {
-      setUploadError("Please set your Gemini API key before uploading scripts.");
-      setIsApiKeyModalOpen(true);
+    // @ts-ignore
+    const hasKey = window.aistudio && await window.aistudio.hasSelectedApiKey();
+    if (!hasKey) {
+      setUploadError("Please select a Gemini API key before uploading scripts.");
+      setShowApiKeyWizard(true);
       if (event.target) event.target.value = '';
       return;
     }
@@ -209,7 +216,8 @@ const App: React.FC = () => {
     setIsUploading(true);
     setUploadError(null);
 
-    const ps1Files = Array.from(files).filter(file => file.name.endsWith('.ps1'));
+    // FIX: Add explicit type for 'file' to prevent type inference issues.
+    const ps1Files = Array.from(files).filter((file: File) => file.name.endsWith('.ps1'));
 
     if (ps1Files.length === 0) {
         setUploadError("No PowerShell (.ps1) files found in the selected folder.");
@@ -228,7 +236,7 @@ const App: React.FC = () => {
                         resolve({script: null, error: `Could not read file: ${file.name}`});
                         return;
                     }
-                    const { title, tags } = await analyzeScriptContent(code, apiKey, model); 
+                    const { title, tags } = await analyzeScriptContent(code, model); 
                     const newScript: Script = {
                         id: `script_${Date.now()}_${file.name.replace('.ps1', '')}`,
                         createdAt: new Date().toISOString(),
@@ -238,8 +246,16 @@ const App: React.FC = () => {
                     };
                     resolve({script: newScript, error: null});
                 } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-                    console.error(`Failed to process file ${file.name}: ${errorMessage}`);
+                    let errorMessage = "An unknown error occurred.";
+                    if (error instanceof Error) {
+                        if (error.message === 'API_KEY_ERROR') {
+                            handleApiKeyError();
+                            errorMessage = "API key is invalid.";
+                        } else {
+                            errorMessage = error.message;
+                        }
+                    }
+                    console.error(`Failed to process file ${file.name}: ${errorMessage}`, error);
                     resolve({script: null, error: `File '${file.name}': ${errorMessage}`});
                 }
             };
@@ -274,13 +290,13 @@ const App: React.FC = () => {
 
   return (
     <>
-      <ApiKeyModal
-        isOpen={isApiKeyModalOpen}
-        onClose={() => setIsApiKeyModalOpen(false)}
-        onSave={handleSaveApiKey}
-        currentApiKey={apiKey}
+      {showApiKeyWizard && <ApiKeyWizard onClose={() => setShowApiKeyWizard(false)} />}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
         selectedModel={model}
         onModelChange={handleSaveModel}
+        onTriggerApiKeyWizard={() => setShowApiKeyWizard(true)}
       />
       <PrivacyModal
         isOpen={isPrivacyModalOpen}
@@ -314,9 +330,9 @@ const App: React.FC = () => {
         <main className="flex-1 h-full flex flex-col relative">
            <div className="absolute top-6 right-8 flex items-center space-x-4 z-10">
               <button
-                onClick={() => setIsApiKeyModalOpen(true)}
+                onClick={() => setIsSettingsModalOpen(true)}
                 className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-yellow-500 dark:text-yellow-400 transition-colors"
-                aria-label="Set API Key"
+                aria-label="Open AI Settings"
               >
                 <KeyIcon className="w-5 h-5" />
               </button>
@@ -334,8 +350,8 @@ const App: React.FC = () => {
                 script={editingScript}
                 onUpdateScript={handleUpdateScript}
                 onCancel={handleCancelEditing}
-                apiKey={apiKey}
                 model={model}
+                onApiKeyError={handleApiKeyError}
               />
             ) : selectedScript ? (
               <ScriptViewer
@@ -346,8 +362,8 @@ const App: React.FC = () => {
             ) : (
               <ScriptGenerator 
                 onSaveScript={handleSaveScript} 
-                apiKey={apiKey}
                 model={model}
+                onApiKeyError={handleApiKeyError}
               />
             )}
           </div>
@@ -368,9 +384,9 @@ const App: React.FC = () => {
             {/* AI Assistant Panel */}
             {isAssistantOpen && (
               <AiAssistant 
-                apiKey={apiKey}
                 model={model}
                 onClose={() => setIsAssistantOpen(false)}
+                onApiKeyError={handleApiKeyError}
               />
             )}
         </main>
